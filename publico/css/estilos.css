@@ -40,3 +40,109 @@ main {
     font-size: 6rem;
     color: #0d6efd;
 }
+
+/* ============================
+   Chat IA
+   ============================ */
+.area-chat {
+    height: 450px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #f8f9fa;
+}
+
+.mensaje-chat {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    max-width: 85%;
+}
+
+.mensaje-usuario {
+    background: #0d6efd;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 0;
+}
+
+.mensaje-ia {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 0;
+}
+
+.mensaje-cabecera {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.8;
+}
+
+.mensaje-contenido ul {
+    padding-left: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.mensaje-contenido p:last-child {
+    margin-bottom: 0;
+}
+
+.oferta-ia-tarjeta {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.oferta-ia-tarjeta h6 {
+    margin-bottom: 0.25rem;
+}
+
+.oferta-ia-tarjeta h6 a {
+    text-decoration: none;
+}
+
+.oferta-ia-tarjeta.recomendacion {
+    border-left: 3px solid #198754;
+}
+
+.cargando-ia {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ============================
+   Mapa
+   ============================ */
+#mapaOfertas {
+    height: 500px;
+    border-radius: 0.5rem;
+}
+
+/* ============================
+   Validacion formularios
+   ============================ */
+.campo-invalido {
+    border-color: #dc3545 !important;
+}
+
+.campo-valido {
+    border-color: #198754 !important;
+}
+
+.mensaje-validacion {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* ============================
+   Panel admin
+   ============================ */
+.tabla-admin {
+    font-size: 0.9rem;
+}
+
+.estado-exitoso { color: #198754; }
+.estado-fallido { color: #dc3545; }
+.estado-parcial { color: #ffc107; }

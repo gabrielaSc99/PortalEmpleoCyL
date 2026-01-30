@@ -27,6 +27,16 @@ class ControladorIA extends Controlador {
     }
 
     /**
+     * Mostrar la vista del chat IA
+     */
+    public function mostrarChat() {
+        $this->requiereAutenticacion();
+        $this->renderizar('ofertas/chat-ia', [
+            'titulo' => 'Asistente IA'
+        ]);
+    }
+
+    /**
      * Buscar ofertas por lenguaje natural (AJAX)
      */
     public function buscarPorLenguajeNatural() {

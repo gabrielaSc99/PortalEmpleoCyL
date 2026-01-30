@@ -37,9 +37,18 @@ Enrutador::get('dashboard', 'ControladorUsuario', 'dashboard');
 Enrutador::get('perfil', 'ControladorUsuario', 'perfil');
 Enrutador::post('perfil', 'ControladorUsuario', 'perfil');
 
-// IA (se activara cuando tengamos la API key)
+// IA
+Enrutador::get('chat-ia', 'ControladorIA', 'mostrarChat');
 Enrutador::post('api/ia/buscar', 'ControladorIA', 'buscarPorLenguajeNatural');
 Enrutador::get('api/ia/recomendar', 'ControladorIA', 'recomendarOfertas');
+
+// Panel de administracion
+Enrutador::get('admin', 'ControladorAdmin', 'panel');
+Enrutador::post('admin/sincronizar', 'ControladorAdmin', 'sincronizar');
+
+// Mapa de ofertas
+Enrutador::get('mapa', 'ControladorOfertas', 'mapa');
+Enrutador::get('api/ofertas/mapa', 'ControladorOfertas', 'datosMapa');
 
 // Resolver la ruta actual
 Enrutador::resolver();

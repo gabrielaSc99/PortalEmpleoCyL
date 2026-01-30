@@ -28,6 +28,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="index.php?ruta=ofertas"><i class="fas fa-search"></i> Ofertas</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php?ruta=mapa"><i class="fas fa-map"></i> Mapa</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isset($_SESSION['id_usuario'])): ?>
@@ -37,12 +40,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="index.php?ruta=favoritos"><i class="fas fa-heart"></i> Favoritos</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php?ruta=chat-ia"><i class="fas fa-robot"></i> Chat IA</a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                 <i class="fas fa-user"></i> <?= htmlspecialchars($_SESSION['nombre_usuario']) ?>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="index.php?ruta=perfil"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
+                                <?php if (($_SESSION['rol_usuario'] ?? '') === 'administrador'): ?>
+                                    <li><a class="dropdown-item" href="index.php?ruta=admin"><i class="fas fa-cogs"></i> Administracion</a></li>
+                                <?php endif; ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="index.php?ruta=logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</a></li>
                             </ul>
@@ -79,5 +88,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/aplicacion.js"></script>
+    <script src="js/validacion.js"></script>
 </body>
 </html>

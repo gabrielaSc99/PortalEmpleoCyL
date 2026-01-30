@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../nucleo/Controlador.php';
+require_once __DIR__ . '/../nucleo/BaseDatos.php';
 require_once __DIR__ . '/../modelos/Oferta.php';
 require_once __DIR__ . '/../modelos/Favorito.php';
 
@@ -92,5 +93,53 @@ class ControladorOfertas extends Controlador {
             'paginas' => $resultado['paginas'],
             'pagina_actual' => $resultado['pagina_actual']
         ]);
+    }
+
+    /**
+     * Mostrar mapa interactivo de ofertas
+     */
+    public function mapa() {
+        $estadisticas = Oferta::obtenerEstadisticas();
+        $this->renderizar('ofertas/mapa', [
+            'titulo' => 'Mapa de Ofertas',
+            'estadisticas' => $estadisticas
+        ]);
+    }
+
+    /**
+     * Datos de ofertas con coordenadas para el mapa (JSON)
+     */
+    public function datosMapa() {
+        // Coordenadas de las capitales de provincia de CyL
+        $coordenadas = [
+            'Avila' => [40.6564, -4.6818],
+            'Burgos' => [42.3440, -3.6969],
+            'Leon' => [42.5987, -5.5671],
+            'Palencia' => [42.0096, -4.5288],
+            'Salamanca' => [40.9701, -5.6635],
+            'Segovia' => [40.9429, -4.1088],
+            'Soria' => [41.7636, -2.4649],
+            'Valladolid' => [41.6523, -4.7245],
+            'Zamora' => [41.5035, -5.7446]
+        ];
+
+        $porProvincia = BaseDatos::consultar(
+            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia"
+        );
+
+        $marcadores = [];
+        foreach ($porProvincia as $prov) {
+            $nombre = $prov['provincia'];
+            if (isset($coordenadas[$nombre])) {
+                $marcadores[] = [
+                    'provincia' => $nombre,
+                    'total' => (int)$prov['total'],
+                    'lat' => $coordenadas[$nombre][0],
+                    'lng' => $coordenadas[$nombre][1]
+                ];
+            }
+        }
+
+        $this->responderJSON(['exito' => true, 'marcadores' => $marcadores]);
     }
 }
