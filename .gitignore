@@ -1,0 +1,16 @@
+# Configuracion sensible
+configuracion/claves_api.php
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Dependencias
+vendor/
+node_modules/

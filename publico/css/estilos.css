@@ -1,0 +1,42 @@
+/**
+ * Estilos personalizados del Portal de Empleo CyL
+ * Complementa Bootstrap 5
+ */
+
+/* Fuente base */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Tarjetas de ofertas - efecto hover */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+
+/* Badge personalizado */
+.badge {
+    font-weight: 500;
+}
+
+/* Pagina 404 */
+.pagina-error {
+    text-align: center;
+    padding: 5rem 0;
+}
+
+.pagina-error h1 {
+    font-size: 6rem;
+    color: #0d6efd;
+}
