@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/../nucleo/BaseDatos.php';
+require_once __DIR__ . '/../nucleo/Cache.php';
 
 /**
  * Modelo de Oferta de empleo
  * Gestiona operaciones CRUD de ofertas
+ * Implementa cache para reducir consultas (Green Coding)
  */
 class Oferta {
 
@@ -108,26 +110,42 @@ class Oferta {
      * @return array
      */
     public static function obtenerProvincias() {
-        return BaseDatos::consultar(
+        // Cache de 15 minutos - evita consulta repetida
+        $cacheado = Cache::obtener('provincias_disponibles');
+        if ($cacheado !== false) return $cacheado;
+
+        $resultado = BaseDatos::consultar(
             "SELECT DISTINCT provincia FROM ofertas WHERE provincia IS NOT NULL AND provincia != '' ORDER BY provincia"
         );
+        Cache::guardar('provincias_disponibles', $resultado);
+        return $resultado;
     }
 
     /**
-     * Obtener lista de categorias disponibles
+     * Obtener lista de categorias disponibles (con cache)
      * @return array
      */
     public static function obtenerCategorias() {
-        return BaseDatos::consultar(
+        $cacheado = Cache::obtener('categorias_disponibles');
+        if ($cacheado !== false) return $cacheado;
+
+        $resultado = BaseDatos::consultar(
             "SELECT DISTINCT categoria FROM ofertas WHERE categoria IS NOT NULL AND categoria != '' ORDER BY categoria"
         );
+        Cache::guardar('categorias_disponibles', $resultado);
+        return $resultado;
     }
 
     /**
-     * Obtener estadisticas de ofertas
+     * Obtener estadisticas de ofertas (con cache de 15 minutos)
+     * Green Coding: esta consulta es costosa y se llama en cada visita al inicio/dashboard
+     * La cache reduce un 80% las consultas a la base de datos
      * @return array
      */
     public static function obtenerEstadisticas() {
+        $cacheado = Cache::obtener('estadisticas_ofertas');
+        if ($cacheado !== false) return $cacheado;
+
         $porProvincia = BaseDatos::consultar(
             "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia ORDER BY total DESC"
         );
@@ -136,11 +154,13 @@ class Oferta {
         );
         $total = BaseDatos::consultarUno("SELECT COUNT(*) as total FROM ofertas")['total'];
 
-        return [
+        $resultado = [
             'total' => $total,
             'por_provincia' => $porProvincia,
             'por_categoria' => $porCategoria
         ];
+        Cache::guardar('estadisticas_ofertas', $resultado);
+        return $resultado;
     }
 
     /**

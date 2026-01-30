@@ -15,6 +15,9 @@ PROMPT_MASTER_PROYECTO_INTERMODULAR*
 .DS_Store
 Thumbs.db
 
+# Cache
+cache/
+
 # Dependencias
 vendor/
 node_modules/

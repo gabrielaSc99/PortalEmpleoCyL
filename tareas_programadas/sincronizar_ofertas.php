@@ -8,6 +8,7 @@
  */
 
 require_once __DIR__ . '/../aplicacion/nucleo/BaseDatos.php';
+require_once __DIR__ . '/../aplicacion/nucleo/Cache.php';
 
 class ServicioSincronizacion {
 
@@ -64,6 +65,13 @@ class ServicioSincronizacion {
 
             // Registrar sincronizacion exitosa
             $this->registrarSincronizacion($totalAnadidas, 0, 'exitoso');
+
+            // Limpiar cache para que los datos nuevos se muestren inmediatamente
+            // Green Coding: solo limpiamos cuando hay datos nuevos
+            if ($totalAnadidas > 0) {
+                Cache::limpiarTodo();
+                echo "Cache limpiada (habia datos nuevos)\n";
+            }
 
             echo "[" . date('Y-m-d H:i:s') . "] Sincronizacion completada.\n";
             echo "Ofertas nuevas: $totalAnadidas\n";
