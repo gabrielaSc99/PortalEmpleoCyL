@@ -8,6 +8,7 @@ session_start();
 // Cargar clases del nucleo
 require_once __DIR__ . '/../aplicacion/nucleo/Configuracion.php';
 require_once __DIR__ . '/../aplicacion/nucleo/Enrutador.php';
+require_once __DIR__ . '/../aplicacion/nucleo/Cache.php';
 
 // Definir rutas
 // Pagina de inicio
@@ -33,7 +34,6 @@ Enrutador::post('api/favoritos/eliminar', 'ControladorFavoritos', 'eliminar');
 Enrutador::post('api/favoritos/estado', 'ControladorFavoritos', 'cambiarEstado');
 
 // Usuario
-Enrutador::get('dashboard', 'ControladorUsuario', 'dashboard');
 Enrutador::get('perfil', 'ControladorUsuario', 'perfil');
 Enrutador::post('perfil', 'ControladorUsuario', 'perfil');
 

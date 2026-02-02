@@ -19,13 +19,15 @@ class ControladorUsuario extends Controlador {
         $totalFavoritos = Favorito::contar($_SESSION['id_usuario']);
         $favoritosRecientes = Favorito::obtenerPorUsuario($_SESSION['id_usuario']);
         $estadisticas = Oferta::obtenerEstadisticas();
+        $estadisticasFavoritos = Favorito::estadisticasPorEstado($_SESSION['id_usuario']);
 
         $this->renderizar('usuario/dashboard', [
             'titulo' => 'Mi Panel',
             'usuario' => $usuario,
             'totalFavoritos' => $totalFavoritos,
             'favoritosRecientes' => array_slice($favoritosRecientes, 0, 5),
-            'estadisticas' => $estadisticas
+            'estadisticas' => $estadisticas,
+            'estadisticasFavoritos' => $estadisticasFavoritos
         ]);
     }
 

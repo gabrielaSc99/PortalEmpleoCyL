@@ -32,7 +32,6 @@ class ControladorOfertas extends Controlador {
         }
 
         $provincias = Oferta::obtenerProvincias();
-        $categorias = Oferta::obtenerCategorias();
 
         $this->renderizar('ofertas/listado', [
             'titulo' => 'Ofertas de Empleo',
@@ -41,8 +40,7 @@ class ControladorOfertas extends Controlador {
             'paginas' => $resultado['paginas'],
             'paginaActual' => $resultado['pagina_actual'],
             'filtros' => $filtros,
-            'provincias' => $provincias,
-            'categorias' => $categorias
+            'provincias' => $provincias
         ]);
     }
 
@@ -111,9 +109,12 @@ class ControladorOfertas extends Controlador {
      */
     public function datosMapa() {
         // Coordenadas de las capitales de provincia de CyL
+        // Incluye variantes con y sin tildes para coincidir con la BD
         $coordenadas = [
+            'Ávila' => [40.6564, -4.6818],
             'Avila' => [40.6564, -4.6818],
             'Burgos' => [42.3440, -3.6969],
+            'León' => [42.5987, -5.5671],
             'Leon' => [42.5987, -5.5671],
             'Palencia' => [42.0096, -4.5288],
             'Salamanca' => [40.9701, -5.6635],
@@ -124,12 +125,12 @@ class ControladorOfertas extends Controlador {
         ];
 
         $porProvincia = BaseDatos::consultar(
-            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia"
+            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' AND provincia != 'Otra' GROUP BY provincia"
         );
 
         $marcadores = [];
         foreach ($porProvincia as $prov) {
-            $nombre = $prov['provincia'];
+            $nombre = trim($prov['provincia']);
             if (isset($coordenadas[$nombre])) {
                 $marcadores[] = [
                     'provincia' => $nombre,

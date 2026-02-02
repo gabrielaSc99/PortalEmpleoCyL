@@ -3,40 +3,108 @@
  * Funciones globales de la aplicacion
  */
 
-/**
- * Alternar favorito (agregar/eliminar)
- * @param {number} idOferta - ID de la oferta
- * @param {HTMLElement} boton - Boton pulsado
- */
+/* ============================================
+   Efecto glassmorphism en navbar al hacer scroll
+   ============================================ */
+document.addEventListener('DOMContentLoaded', function() {
+    var navbar = document.querySelector('.navbar-portal');
+    if (navbar) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 30) {
+                navbar.classList.add('con-cristal');
+            } else {
+                navbar.classList.remove('con-cristal');
+            }
+        });
+    }
+
+    /* ============================================
+       Hamburguesa animada
+       ============================================ */
+    var botonHamburguesa = document.getElementById('botonHamburguesa');
+    var menuNavegacion = document.getElementById('menuNavegacion');
+    if (botonHamburguesa && menuNavegacion) {
+        botonHamburguesa.addEventListener('click', function() {
+            botonHamburguesa.classList.toggle('activo');
+            menuNavegacion.classList.toggle('show');
+        });
+    }
+
+    /* ============================================
+       Scroll reveal - elementos con clase .revelar
+       ============================================ */
+    var elementosRevelar = document.querySelectorAll('.revelar, .tarjeta-animada, .tarjeta-estadistica, .tarjeta-panel');
+    if (elementosRevelar.length > 0 && 'IntersectionObserver' in window) {
+        var observador = new IntersectionObserver(function(entradas) {
+            entradas.forEach(function(entrada) {
+                if (entrada.isIntersecting) {
+                    entrada.target.classList.add('visible');
+                    observador.unobserve(entrada.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        elementosRevelar.forEach(function(el) {
+            observador.observe(el);
+        });
+    }
+
+    /* ============================================
+       Efecto ripple en botones
+       ============================================ */
+    document.addEventListener('click', function(e) {
+        var boton = e.target.closest('.btn-primary, .btn-outline-primary, .filtro-pill');
+        if (!boton) return;
+
+        var rect = boton.getBoundingClientRect();
+        var onda = document.createElement('span');
+        onda.className = 'efecto-onda';
+        onda.style.left = (e.clientX - rect.left) + 'px';
+        onda.style.top = (e.clientY - rect.top) + 'px';
+        boton.style.position = 'relative';
+        boton.style.overflow = 'hidden';
+        boton.appendChild(onda);
+
+        setTimeout(function() {
+            onda.remove();
+        }, 600);
+    });
+});
+
+/* ============================================
+   Alternar favorito (agregar/eliminar)
+   ============================================ */
 async function alternarFavorito(idOferta, boton) {
     try {
-        const icono = boton.querySelector('i');
-        const esFavorito = icono.classList.contains('fas');
+        var icono = boton.querySelector('i');
+        var esFavorito = icono.classList.contains('fas');
 
-        const url = esFavorito ? 'index.php?ruta=api/favoritos/eliminar' : 'index.php?ruta=api/favoritos/agregar';
+        var url = esFavorito ? 'index.php?ruta=api/favoritos/eliminar' : 'index.php?ruta=api/favoritos/agregar';
 
-        const respuesta = await fetch(url, {
+        var respuesta = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_oferta: idOferta })
         });
 
-        const datos = await respuesta.json();
+        var datos = await respuesta.json();
 
         if (datos.exito) {
             if (esFavorito) {
                 icono.classList.remove('fas');
                 icono.classList.add('far');
+                boton.classList.remove('activo');
             } else {
                 icono.classList.remove('far');
                 icono.classList.add('fas');
+                boton.classList.add('activo');
             }
-            mostrarNotificacion(datos.mensaje, 'success');
+            mostrarNotificacion(datos.mensaje, 'exito');
         } else {
-            mostrarNotificacion(datos.mensaje, 'warning');
+            mostrarNotificacion(datos.mensaje, 'aviso');
         }
     } catch (error) {
-        mostrarNotificacion('Error al procesar la solicitud', 'danger');
+        mostrarNotificacion('Error al procesar la solicitud', 'error');
     }
 }
 
@@ -46,26 +114,28 @@ async function alternarFavorito(idOferta, boton) {
  */
 async function eliminarDeFavoritos(idOferta) {
     try {
-        const respuesta = await fetch('index.php?ruta=api/favoritos/eliminar', {
+        var respuesta = await fetch('index.php?ruta=api/favoritos/eliminar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_oferta: idOferta })
         });
 
-        const datos = await respuesta.json();
+        var datos = await respuesta.json();
 
         if (datos.exito) {
-            // Eliminar tarjeta del DOM si existe
-            const tarjeta = document.getElementById('favorito-' + idOferta);
+            var tarjeta = document.getElementById('favorito-' + idOferta);
             if (tarjeta) {
-                tarjeta.remove();
+                tarjeta.style.opacity = '0';
+                tarjeta.style.transform = 'scale(0.9)';
+                tarjeta.style.transition = 'all 0.3s ease';
+                setTimeout(function() { tarjeta.remove(); }, 300);
             } else {
                 location.reload();
             }
-            mostrarNotificacion('Oferta eliminada de favoritos', 'success');
+            mostrarNotificacion('Oferta eliminada de favoritos', 'exito');
         }
     } catch (error) {
-        mostrarNotificacion('Error al eliminar favorito', 'danger');
+        mostrarNotificacion('Error al eliminar favorito', 'error');
     }
 }
 
@@ -76,48 +146,59 @@ async function eliminarDeFavoritos(idOferta) {
  */
 async function cambiarEstadoFavorito(idOferta, estado) {
     try {
-        const respuesta = await fetch('index.php?ruta=api/favoritos/estado', {
+        var respuesta = await fetch('index.php?ruta=api/favoritos/estado', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_oferta: idOferta, estado: estado })
         });
 
-        const datos = await respuesta.json();
+        var datos = await respuesta.json();
 
         if (datos.exito) {
-            mostrarNotificacion('Estado actualizado a: ' + estado, 'success');
+            mostrarNotificacion('Estado actualizado a: ' + estado, 'exito');
         }
     } catch (error) {
-        mostrarNotificacion('Error al cambiar estado', 'danger');
+        mostrarNotificacion('Error al cambiar estado', 'error');
     }
 }
 
 /**
- * Mostrar notificacion temporal tipo toast
+ * Mostrar notificacion toast moderna
  * @param {string} mensaje
- * @param {string} tipo - 'success', 'danger', 'warning', 'info'
+ * @param {string} tipo - 'exito', 'error', 'aviso', 'info'
  */
-function mostrarNotificacion(mensaje, tipo = 'info') {
-    // Crear contenedor de toasts si no existe
-    let contenedor = document.getElementById('contenedor-notificaciones');
+function mostrarNotificacion(mensaje, tipo) {
+    tipo = tipo || 'info';
+
+    var contenedor = document.getElementById('contenedor-notificaciones');
     if (!contenedor) {
         contenedor = document.createElement('div');
         contenedor.id = 'contenedor-notificaciones';
-        contenedor.className = 'position-fixed top-0 end-0 p-3';
-        contenedor.style.zIndex = '1100';
+        contenedor.style.cssText = 'position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;';
         document.body.appendChild(contenedor);
     }
 
-    const toast = document.createElement('div');
-    toast.className = `alert alert-${tipo} alert-dismissible fade show shadow`;
-    toast.innerHTML = `
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    var iconos = {
+        'exito': 'fa-check-circle',
+        'error': 'fa-times-circle',
+        'aviso': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle',
+        'success': 'fa-check-circle',
+        'danger': 'fa-times-circle',
+        'warning': 'fa-exclamation-triangle'
+    };
+
+    var toast = document.createElement('div');
+    toast.className = 'notificacion-toast notificacion-' + tipo;
+    toast.innerHTML = '<i class="fas ' + (iconos[tipo] || 'fa-info-circle') + '"></i> ' + mensaje;
     contenedor.appendChild(toast);
 
-    // Auto-eliminar despues de 3 segundos
-    setTimeout(() => {
-        toast.remove();
+    // Forzar reflow para activar animacion
+    toast.offsetHeight;
+    toast.classList.add('visible');
+
+    setTimeout(function() {
+        toast.classList.remove('visible');
+        setTimeout(function() { toast.remove(); }, 300);
     }, 3000);
 }

@@ -25,7 +25,7 @@ class ServicioSincronizacion {
         echo "[" . date('Y-m-d H:i:s') . "] Iniciando sincronizacion de ofertas...\n";
 
         $totalAnadidas = 0;
-        $totalExistentes = 0;
+        $totalActualizadas = 0;
         $offset = 0;
         $totalRegistros = null;
 
@@ -50,8 +50,8 @@ class ServicioSincronizacion {
 
                     if ($resultado === 'insertada') {
                         $totalAnadidas++;
-                    } else {
-                        $totalExistentes++;
+                    } elseif ($resultado === 'actualizada') {
+                        $totalActualizadas++;
                     }
                 }
 
@@ -64,22 +64,21 @@ class ServicioSincronizacion {
             } while ($offset < $totalRegistros);
 
             // Registrar sincronizacion exitosa
-            $this->registrarSincronizacion($totalAnadidas, 0, 'exitoso');
+            $this->registrarSincronizacion($totalAnadidas, $totalActualizadas, 'exitoso');
 
-            // Limpiar cache para que los datos nuevos se muestren inmediatamente
-            // Green Coding: solo limpiamos cuando hay datos nuevos
-            if ($totalAnadidas > 0) {
+            // Limpiar cache si hubo cambios
+            if ($totalAnadidas > 0 || $totalActualizadas > 0) {
                 Cache::limpiarTodo();
-                echo "Cache limpiada (habia datos nuevos)\n";
+                echo "Cache limpiada (hubo cambios)\n";
             }
 
             echo "[" . date('Y-m-d H:i:s') . "] Sincronizacion completada.\n";
             echo "Ofertas nuevas: $totalAnadidas\n";
-            echo "Ofertas existentes: $totalExistentes\n";
+            echo "Ofertas actualizadas: $totalActualizadas\n";
 
         } catch (Exception $e) {
             echo "ERROR: " . $e->getMessage() . "\n";
-            $this->registrarSincronizacion($totalAnadidas, 0, 'fallido', $e->getMessage());
+            $this->registrarSincronizacion($totalAnadidas, $totalActualizadas, 'fallido', $e->getMessage());
         }
     }
 
@@ -91,16 +90,19 @@ class ServicioSincronizacion {
     private function obtenerDesdeAPI($offset = 0) {
         $url = $this->urlApi . '?limit=' . $this->registrosPorPeticion . '&offset=' . $offset;
 
-        $contexto = stream_context_create([
-            'http' => [
-                'timeout' => 30,
-                'header' => 'Accept: application/json'
-            ]
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ['Accept: application/json'],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => false
         ]);
 
-        $respuesta = @file_get_contents($url, false, $contexto);
+        $respuesta = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        if ($respuesta === false) {
+        if ($respuesta === false || $httpCode !== 200) {
             return false;
         }
 
@@ -157,7 +159,16 @@ class ServicioSincronizacion {
             return 'insertada';
         }
 
-        return 'existente';
+        // Actualizar datos por si cambiaron
+        BaseDatos::ejecutar(
+            "UPDATE ofertas SET titulo = ?, descripcion = ?, empresa = ?, provincia = ?, url = ?, fecha_actualizacion = NOW()
+             WHERE id_fuente = ?",
+            [
+                $oferta['titulo'], $oferta['descripcion'], $oferta['empresa'],
+                $oferta['provincia'], $oferta['url'], $oferta['id_fuente']
+            ]
+        );
+        return 'actualizada';
     }
 
     /**

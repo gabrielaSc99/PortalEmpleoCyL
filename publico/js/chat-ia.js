@@ -20,7 +20,7 @@ async function enviarConsultaIA() {
     const idCarga = agregarMensajeChat('ia', '<div class="cargando-ia"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Buscando ofertas...</div>');
 
     try {
-        const respuesta = await fetch('index.php?ruta=api/ia/buscar', {
+        const respuesta = await fetch((typeof URL_BASE !== 'undefined' ? URL_BASE : 'index.php') + '?ruta=api/ia/buscar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ consulta: consulta })
@@ -59,7 +59,8 @@ async function enviarConsultaIA() {
         }
     } catch (error) {
         eliminarMensajeChat(idCarga);
-        agregarMensajeChat('ia', '<p class="text-danger">Error de conexion. Verifica tu conexion a internet.</p>');
+        console.error('Error chat IA:', error);
+        agregarMensajeChat('ia', '<p class="text-danger">Error: ' + error.message + '</p>');
     }
 }
 
@@ -70,7 +71,7 @@ async function obtenerRecomendaciones() {
     const idCarga = agregarMensajeChat('ia', '<div class="cargando-ia"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Analizando tu perfil para recomendaciones...</div>');
 
     try {
-        const respuesta = await fetch('index.php?ruta=api/ia/recomendar');
+        const respuesta = await fetch((typeof URL_BASE !== 'undefined' ? URL_BASE : 'index.php') + '?ruta=api/ia/recomendar');
         const datos = await respuesta.json();
 
         eliminarMensajeChat(idCarga);

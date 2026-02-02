@@ -137,6 +137,21 @@ class Oferta {
     }
 
     /**
+     * Obtener tipos de contrato disponibles (con cache)
+     * @return array
+     */
+    public static function obtenerTiposContrato() {
+        $cacheado = Cache::obtener('tipos_contrato_disponibles');
+        if ($cacheado !== false) return $cacheado;
+
+        $resultado = BaseDatos::consultar(
+            "SELECT DISTINCT tipo_contrato FROM ofertas WHERE tipo_contrato IS NOT NULL AND tipo_contrato != '' ORDER BY tipo_contrato"
+        );
+        Cache::guardar('tipos_contrato_disponibles', $resultado);
+        return $resultado;
+    }
+
+    /**
      * Obtener estadisticas de ofertas (con cache de 15 minutos)
      * Green Coding: esta consulta es costosa y se llama en cada visita al inicio/dashboard
      * La cache reduce un 80% las consultas a la base de datos
@@ -147,7 +162,7 @@ class Oferta {
         if ($cacheado !== false) return $cacheado;
 
         $porProvincia = BaseDatos::consultar(
-            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia ORDER BY total DESC"
+            "SELECT CASE WHEN provincia = 'Otra' THEN 'Ámbito nacional' ELSE provincia END as provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia ORDER BY total DESC"
         );
         $porCategoria = BaseDatos::consultar(
             "SELECT categoria, COUNT(*) as total FROM ofertas WHERE categoria != '' GROUP BY categoria ORDER BY total DESC LIMIT 10"

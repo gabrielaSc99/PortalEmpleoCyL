@@ -1,13 +1,19 @@
-<div class="container py-4">
+<div class="container" style="padding: 2rem 0 3rem;">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h2 class="mb-4"><i class="fas fa-user-edit text-primary"></i> Mi Perfil</h2>
+        <div class="col-md-8 col-lg-6">
+            <div class="tarjeta-auth">
+                <div class="cabecera-auth">
+                    <div class="icono-auth">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <h2>Mi Perfil</h2>
+                    <p style="color: var(--texto-secundario); font-size: 0.9rem;">Actualiza tus datos para mejorar las recomendaciones</p>
+                </div>
 
+                <div class="cuerpo-auth">
                     <?php if (!empty($mensaje)): ?>
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> <?= htmlspecialchars($mensaje) ?>
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-1"></i> <?= htmlspecialchars($mensaje) ?>
                         </div>
                     <?php endif; ?>
 
@@ -20,8 +26,9 @@
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="<?= htmlspecialchars($usuario['email']) ?>" disabled>
-                            <small class="text-muted">El email no se puede cambiar</small>
+                            <input type="email" class="form-control" value="<?= htmlspecialchars($usuario['email']) ?>" disabled
+                                   style="background: var(--fondo-principal);">
+                            <small style="color: var(--texto-terciario); font-size: 0.78rem;">El email no se puede cambiar</small>
                         </div>
 
                         <div class="row">
@@ -30,7 +37,7 @@
                                 <select class="form-select" id="provincia" name="provincia">
                                     <option value="">Seleccionar...</option>
                                     <?php
-                                    $provinciasCyL = ['Avila','Burgos','Leon','Palencia','Salamanca','Segovia','Soria','Valladolid','Zamora'];
+                                    $provinciasCyL = ['Ávila','Burgos','León','Palencia','Salamanca','Segovia','Soria','Valladolid','Zamora'];
                                     foreach ($provinciasCyL as $prov):
                                     ?>
                                         <option value="<?= $prov ?>" <?= ($usuario['provincia'] ?? '') === $prov ? 'selected' : '' ?>><?= $prov ?></option>
@@ -55,7 +62,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Guardar cambios
+                            <i class="fas fa-save me-1"></i> Guardar cambios
                         </button>
                     </form>
                 </div>

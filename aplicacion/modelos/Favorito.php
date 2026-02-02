@@ -107,4 +107,16 @@ class Favorito {
         );
         return $resultado['total'];
     }
+
+    /**
+     * Obtener estadisticas de favoritos por estado
+     * @param int $idUsuario
+     * @return array
+     */
+    public static function estadisticasPorEstado($idUsuario) {
+        return BaseDatos::consultar(
+            "SELECT estado, COUNT(*) as total FROM favoritos WHERE id_usuario = ? GROUP BY estado",
+            [$idUsuario]
+        );
+    }
 }

@@ -6,24 +6,27 @@ require_once __DIR__ . '/../modelos/Usuario.php';
 
 /**
  * Controlador de Inteligencia Artificial
- * Integra Google Gemini para busqueda por lenguaje natural y recomendaciones
+ * Integra OpenRouter para busqueda por lenguaje natural y recomendaciones
  */
 class ControladorIA extends Controlador {
 
     /** @var string Clave de API */
     private $claveApi;
 
-    /** @var string Modelo de Gemini */
+    /** @var string Modelo */
     private $modelo;
 
-    /** @var string URL base de la API */
-    private $urlBase;
+    /** @var string URL de la API */
+    private $urlApi;
+
+    /** @var string Ultimo error */
+    private $ultimoError;
 
     public function __construct() {
         $config = Configuracion::obtenerClavesAPI();
-        $this->claveApi = $config['gemini']['clave'];
-        $this->modelo = $config['gemini']['modelo'];
-        $this->urlBase = $config['gemini']['url'];
+        $this->claveApi = $config['ia']['clave'] ?? '';
+        $this->modelo = $config['ia']['modelo'];
+        $this->urlApi = $config['ia']['url'];
     }
 
     /**
@@ -55,35 +58,42 @@ class ControladorIA extends Controlador {
 
         $usuario = Usuario::buscarPorId($_SESSION['id_usuario']);
 
-        // Construir prompt para Gemini
+        // Construir prompt
+        $provinciaUsuario = $usuario['provincia'] ?? '';
         $prompt = "Eres un asistente de busqueda de empleo en Castilla y Leon (Espana).
-El usuario busca ofertas de empleo. Analiza su consulta y extrae los filtros de busqueda.
+Analiza la consulta del usuario y extrae filtros de busqueda.
 
-Provincias disponibles: " . implode(', ', $listadoProvincias) . "
+REGLAS IMPORTANTES:
+- Si el usuario menciona una provincia, usa esa provincia.
+- Si NO menciona provincia, usa la provincia de su perfil: \"$provinciaUsuario\".
+- El campo \"texto\" debe contener palabras clave cortas y genericas para buscar en titulos de ofertas (ej: \"programador\", \"administrativo\", \"soldador\").
+- NO uses el campo \"categoria\" porque no hay categorias en la base de datos, dejalo siempre vacio.
+
+Provincias validas: " . implode(', ', $listadoProvincias) . "
 
 Perfil del usuario:
-- Provincia: " . ($usuario['provincia'] ?? 'No especificada') . "
+- Provincia: " . ($provinciaUsuario ?: 'No especificada') . "
 - Sector: " . ($usuario['sector'] ?? 'No especificado') . "
 - Experiencia: " . ($usuario['nivel_experiencia'] ?? 'No especificada') . "
 
-Consulta del usuario: \"$consulta\"
+Consulta: \"$consulta\"
 
-Responde UNICAMENTE con un JSON valido (sin markdown, sin explicacion) con esta estructura:
+Responde SOLO con JSON valido, sin markdown ni explicacion:
 {
-    \"texto\": \"palabras clave para buscar en titulo y descripcion\",
-    \"provincia\": \"nombre de provincia si se menciona, o vacio\",
-    \"categoria\": \"categoria si se detecta, o vacio\",
-    \"respuesta_usuario\": \"respuesta amigable en espanol explicando que vas a buscar\"
+    \"texto\": \"palabras clave cortas\",
+    \"provincia\": \"provincia del filtro\",
+    \"categoria\": \"\",
+    \"respuesta_usuario\": \"respuesta amigable en espanol\"
 }";
 
-        $respuestaIA = $this->llamarGemini($prompt);
+        $respuestaIA = $this->llamarIA($prompt);
 
         if ($respuestaIA === false) {
-            $this->responderJSON(['exito' => false, 'mensaje' => 'Error al conectar con la IA']);
+            $this->responderJSON(['exito' => false, 'mensaje' => 'Error IA: ' . ($this->ultimoError ?? 'desconocido')]);
             return;
         }
 
-        // Parsear respuesta JSON de Gemini
+        // Parsear respuesta JSON
         $filtrosIA = json_decode($respuestaIA, true);
 
         if (!$filtrosIA) {
@@ -93,18 +103,43 @@ Responde UNICAMENTE con un JSON valido (sin markdown, sin explicacion) con esta 
         }
 
         // Buscar ofertas con los filtros
+        $textoOriginal = $filtrosIA['texto'] ?? $consulta;
+        $provinciaOriginal = $filtrosIA['provincia'] ?? '';
         $filtros = [
-            'texto' => $filtrosIA['texto'] ?? $consulta,
-            'provincia' => $filtrosIA['provincia'] ?? '',
-            'categoria' => $filtrosIA['categoria'] ?? ''
+            'texto' => $textoOriginal,
+            'provincia' => $provinciaOriginal
         ];
         $filtros = array_filter($filtros);
 
         $resultado = Oferta::buscar($filtros, 1, 10);
+        $mensaje = $filtrosIA['respuesta_usuario'] ?? 'Aqui tienes los resultados de tu busqueda.';
+        $nota = '';
+
+        // Fallback: si no hay resultados, buscar solo por provincia
+        if ($resultado['total'] == 0 && !empty($textoOriginal) && !empty($provinciaOriginal)) {
+            $resultado = Oferta::buscar(['provincia' => $provinciaOriginal], 1, 10);
+            if ($resultado['total'] > 0) {
+                $nota = "No encontre ofertas de \"$textoOriginal\" en $provinciaOriginal, pero aqui tienes otras ofertas disponibles en esa zona.";
+            }
+        }
+
+        // Fallback: si sigue sin resultados, buscar solo por texto
+        if ($resultado['total'] == 0 && !empty($textoOriginal)) {
+            $resultado = Oferta::buscar(['texto' => $textoOriginal], 1, 10);
+            if ($resultado['total'] > 0) {
+                $nota = "No encontre ofertas de \"$textoOriginal\" en $provinciaOriginal, pero hay algunas en otras provincias.";
+            }
+        }
+
+        // Fallback: mostrar ofertas recientes
+        if ($resultado['total'] == 0) {
+            $resultado = Oferta::buscar([], 1, 10);
+            $nota = "No encontre ofertas con esos criterios. Te muestro las ofertas mas recientes disponibles.";
+        }
 
         $this->responderJSON([
             'exito' => true,
-            'mensaje' => $filtrosIA['respuesta_usuario'] ?? 'Aqui tienes los resultados de tu busqueda.',
+            'mensaje' => !empty($nota) ? $nota : $mensaje,
             'ofertas' => $resultado['ofertas'],
             'total' => $resultado['total'],
             'filtros_aplicados' => $filtros
@@ -158,10 +193,10 @@ Responde UNICAMENTE con un JSON valido (sin markdown) con esta estructura:
     \"mensaje\": \"mensaje personalizado para el usuario\"
 }";
 
-        $respuestaIA = $this->llamarGemini($prompt);
+        $respuestaIA = $this->llamarIA($prompt);
 
         if ($respuestaIA === false) {
-            $this->responderJSON(['exito' => false, 'mensaje' => 'Error al conectar con la IA']);
+            $this->responderJSON(['exito' => false, 'mensaje' => 'Error IA: ' . ($this->ultimoError ?? 'desconocido')]);
             return;
         }
 
@@ -189,46 +224,53 @@ Responde UNICAMENTE con un JSON valido (sin markdown) con esta estructura:
     }
 
     /**
-     * Llamar a la API de Google Gemini
+     * Llamar a la API de OpenRouter
      * @param string $prompt Texto del prompt
      * @return string|false Respuesta de texto o false en caso de error
      */
-    private function llamarGemini($prompt) {
-        $url = $this->urlBase . $this->modelo . ':generateContent?key=' . $this->claveApi;
-
+    private function llamarIA($prompt) {
         $datos = [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
+            'model' => $this->modelo,
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt]
             ],
-            'generationConfig' => [
-                'temperature' => 0.3,
-                'maxOutputTokens' => 1024
-            ]
+            'temperature' => 0.3,
+            'max_tokens' => 1024
         ];
 
-        $opciones = [
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => json_encode($datos),
-                'timeout' => 30
-            ]
+        $headers = [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $this->claveApi
         ];
 
-        $contexto = stream_context_create($opciones);
-        $respuesta = @file_get_contents($url, false, $contexto);
+        $ch = curl_init($this->urlApi);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => json_encode($datos),
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
 
-        if ($respuesta === false) {
+        $respuesta = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($respuesta === false || $httpCode !== 200) {
+            if ($httpCode === 429) {
+                $this->ultimoError = 'Cuota de la API agotada. Intentalo mas tarde.';
+            } elseif ($httpCode === 401) {
+                $this->ultimoError = 'Clave de API no valida.';
+            } else {
+                $this->ultimoError = $curlError ?: "HTTP $httpCode - $respuesta";
+            }
             return false;
         }
 
         $resultado = json_decode($respuesta, true);
 
-        // Extraer texto de la respuesta de Gemini
-        return $resultado['candidates'][0]['content']['parts'][0]['text'] ?? false;
+        return $resultado['choices'][0]['message']['content'] ?? false;
     }
 }
