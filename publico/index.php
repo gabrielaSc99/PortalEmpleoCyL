@@ -42,10 +42,6 @@ Enrutador::get('chat-ia', 'ControladorIA', 'mostrarChat');
 Enrutador::post('api/ia/buscar', 'ControladorIA', 'buscarPorLenguajeNatural');
 Enrutador::get('api/ia/recomendar', 'ControladorIA', 'recomendarOfertas');
 
-// Panel de administracion
-Enrutador::get('admin', 'ControladorAdmin', 'panel');
-Enrutador::post('admin/sincronizar', 'ControladorAdmin', 'sincronizar');
-
 // Mapa de ofertas
 Enrutador::get('mapa', 'ControladorOfertas', 'mapa');
 Enrutador::get('api/ofertas/mapa', 'ControladorOfertas', 'datosMapa');

@@ -20,8 +20,8 @@ class Usuario {
     public static function crear($email, $contrasena, $nombre, $provincia = '', $sector = '', $nivelExperiencia = 'sin_experiencia') {
         $contrasenaHash = password_hash($contrasena, PASSWORD_DEFAULT);
         BaseDatos::ejecutar(
-            "INSERT INTO usuarios (email, contrasena, nombre, provincia, sector, nivel_experiencia, rol)
-             VALUES (?, ?, ?, ?, ?, ?, 'usuario')",
+            "INSERT INTO usuarios (email, contrasena, nombre, provincia, sector, nivel_experiencia)
+             VALUES (?, ?, ?, ?, ?, ?)",
             [$email, $contrasenaHash, $nombre, $provincia, $sector, $nivelExperiencia]
         );
         return BaseDatos::ultimoId();
@@ -46,7 +46,7 @@ class Usuario {
      */
     public static function buscarPorId($id) {
         return BaseDatos::consultarUno(
-            "SELECT id, email, nombre, provincia, sector, nivel_experiencia, rol, fecha_creacion
+            "SELECT id, email, nombre, provincia, sector, nivel_experiencia, fecha_creacion
              FROM usuarios WHERE id = ?",
             [$id]
         );

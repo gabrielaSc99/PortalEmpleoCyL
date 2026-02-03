@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <defs>
+    <!-- Degradados rojos premium -->
+    <linearGradient id="rojoPremiumB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEE2E2"/>
+      <stop offset="20%" style="stop-color:#FCA5A5"/>
+      <stop offset="50%" style="stop-color:#EF4444"/>
+      <stop offset="80%" style="stop-color:#DC2626"/>
+      <stop offset="100%" style="stop-color:#7F1D1D"/>
+    </linearGradient>
+    <linearGradient id="rojoMetalicoB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F87171"/>
+      <stop offset="40%" style="stop-color:#DC2626"/>
+      <stop offset="60%" style="stop-color:#B91C1C"/>
+      <stop offset="100%" style="stop-color:#991B1B"/>
+    </linearGradient>
+
+    <!-- Degradados grises más claros para fondo oscuro -->
+    <linearGradient id="grisPremiumB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#94A3B8"/>
+      <stop offset="30%" style="stop-color:#64748B"/>
+      <stop offset="70%" style="stop-color:#475569"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <linearGradient id="grisMetalicoB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CBD5E1"/>
+      <stop offset="50%" style="stop-color:#94A3B8"/>
+      <stop offset="100%" style="stop-color:#64748B"/>
+    </linearGradient>
+    <linearGradient id="bordeDoradoB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FDE68A"/>
+      <stop offset="50%" style="stop-color:#FCD34D"/>
+      <stop offset="100%" style="stop-color:#F59E0B"/>
+    </linearGradient>
+
+    <!-- Filtros -->
+    <filter id="sombra3DB" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <filter id="glowRojoB" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feFlood flood-color="#EF4444" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Textura -->
+    <pattern id="texturaB" patternUnits="userSpaceOnUse" width="4" height="4">
+      <circle cx="1" cy="1" r="0.5" fill="rgba(255,255,255,0.05)"/>
+    </pattern>
+  </defs>
+
+  <!-- HEXÁGONO 3D - VERSIÓN FONDO OSCURO -->
+  <g filter="url(#sombra3DB)">
+
+    <!-- Sombra del hexágono -->
+    <polygon points="30,2 54,16 54,44 30,58 6,44 6,16"
+             fill="#1E293B" transform="translate(1,1)"/>
+
+    <!-- Hexágono base -->
+    <polygon points="30,2 54,16 54,44 30,58 6,44 6,16"
+             fill="url(#grisPremiumB)"/>
+
+    <!-- Textura -->
+    <polygon points="30,2 54,16 54,44 30,58 6,44 6,16"
+             fill="url(#texturaB)"/>
+
+    <!-- Borde brillante -->
+    <polygon points="30,2 54,16 54,44 30,58 6,44 6,16"
+             fill="none" stroke="url(#grisMetalicoB)" stroke-width="2"/>
+
+    <!-- Reflejo superior -->
+    <polygon points="30,2 54,16 54,25 30,20 6,25 6,16"
+             fill="url(#grisPremiumB)" opacity="0.3"/>
+    <polygon points="30,4 50,16 50,22 30,18 10,22 10,16"
+             fill="rgba(255,255,255,0.15)"/>
+
+    <!-- Hexágono interior -->
+    <polygon points="30,10 46,20 46,40 30,50 14,40 14,20"
+             fill="none" stroke="#94A3B8" stroke-width="1" opacity="0.3"/>
+
+    <!-- Gráfico 3D -->
+    <g filter="url(#glowRojoB)">
+      <!-- Barra 1 -->
+      <g>
+        <polygon points="16,42 22,42 22,36 16,36" fill="#94A3B8"/>
+        <polygon points="22,42 25,40 25,34 22,36" fill="#64748B"/>
+        <polygon points="16,36 22,36 25,34 19,34" fill="#CBD5E1"/>
+      </g>
+
+      <!-- Barra 2 -->
+      <g>
+        <polygon points="25,42 31,42 31,30 25,30" fill="#CBD5E1"/>
+        <polygon points="31,42 34,40 34,28 31,30" fill="#94A3B8"/>
+        <polygon points="25,30 31,30 34,28 28,28" fill="#E2E8F0"/>
+      </g>
+
+      <!-- Barra 3 (roja) -->
+      <g>
+        <polygon points="34,42 40,42 40,20 34,20" fill="url(#rojoMetalicoB)"/>
+        <polygon points="40,42 43,40 43,18 40,20" fill="#B91C1C"/>
+        <polygon points="34,20 40,20 43,18 37,18" fill="#FCA5A5"/>
+        <polygon points="35,21 39,21 39,30 35,30" fill="rgba(255,255,255,0.25)"/>
+      </g>
+
+      <!-- Flecha -->
+      <g>
+        <path d="M18,34 Q28,26 38,16" fill="none" stroke="url(#rojoPremiumB)" stroke-width="2.5" stroke-linecap="round"/>
+        <polygon points="38,16 44,14 40,20" fill="url(#rojoPremiumB)"/>
+        <path d="M20,32 Q28,26 36,18" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-linecap="round"/>
+      </g>
+    </g>
+
+    <!-- Puntos dorados -->
+    <g fill="url(#bordeDoradoB)" opacity="0.8">
+      <circle cx="30" cy="5" r="2"/>
+      <circle cx="51" cy="17" r="1.5"/>
+      <circle cx="51" cy="43" r="1.5"/>
+      <circle cx="30" cy="55" r="2"/>
+      <circle cx="9" cy="43" r="1.5"/>
+      <circle cx="9" cy="17" r="1.5"/>
+    </g>
+
+  </g>
+</svg>

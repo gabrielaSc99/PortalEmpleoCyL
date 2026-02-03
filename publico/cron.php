@@ -1,13 +1,15 @@
 <?php
 /**
  * Endpoint para sincronizacion automatica via cron externo
- * URL: http://tu-dominio/PortalEmpleoCyL/publico/cron.php?token=TU_TOKEN
+ * URL: http://tu-dominio/PortalEmpleoCyL/publico/cron.php?token=TU_TOKEN_SEGURO
+ * Configurar token via variable de entorno CRON_SYNC_TOKEN o editar el valor por defecto
  *
  * Green Coding: solo se ejecuta si han pasado 24h desde la ultima sincronizacion
  */
 
 // Token de seguridad para evitar que cualquiera lance la sincronizacion
-$tokenValido = 'sync_empleo_cyl_2026';
+// Configurable via variable de entorno o valor por defecto
+$tokenValido = getenv('CRON_SYNC_TOKEN') ?: 'aX9kL2mQ7vZ4wP8nR1jT6yB3cF5hD0sE';
 
 // Verificar token
 $token = $_GET['token'] ?? '';

@@ -315,7 +315,7 @@ fetch('index.php?ruta=api/ofertas/mapa')
                 <div class="col-12 text-center py-5">
                     <i class="fas fa-inbox fa-3x mb-3" style="color: var(--texto-terciario);"></i>
                     <h4>No hay ofertas disponibles</h4>
-                    <p style="color: var(--texto-secundario);">Importa datos desde el panel de administración para comenzar.</p>
+                    <p style="color: var(--texto-secundario);">Las ofertas se sincronizan automaticamente cada 24 horas.</p>
                 </div>
             <?php endif; ?>
         </div>

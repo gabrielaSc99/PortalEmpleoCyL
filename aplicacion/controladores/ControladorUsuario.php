@@ -40,6 +40,9 @@ class ControladorUsuario extends Controlador {
         $usuario = Usuario::buscarPorId($_SESSION['id_usuario']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Validar token CSRF
+            $this->verificarCSRF();
+
             $datos = [
                 'nombre' => $this->obtenerPost('nombre'),
                 'provincia' => $this->obtenerPost('provincia', ''),
@@ -53,15 +56,19 @@ class ControladorUsuario extends Controlador {
             $usuario = Usuario::buscarPorId($_SESSION['id_usuario']);
             $this->renderizar('usuario/perfil', [
                 'titulo' => 'Mi Perfil',
+                'metaDescripcion' => 'Gestiona tu perfil en el Portal de Empleo de Castilla y Leon.',
                 'usuario' => $usuario,
-                'mensaje' => 'Perfil actualizado correctamente'
+                'mensaje' => 'Perfil actualizado correctamente',
+                'csrfCampo' => $this->campoCSRF()
             ]);
             return;
         }
 
         $this->renderizar('usuario/perfil', [
             'titulo' => 'Mi Perfil',
-            'usuario' => $usuario
+            'metaDescripcion' => 'Gestiona tu perfil en el Portal de Empleo de Castilla y Leon.',
+            'usuario' => $usuario,
+            'csrfCampo' => $this->campoCSRF()
         ]);
     }
 }

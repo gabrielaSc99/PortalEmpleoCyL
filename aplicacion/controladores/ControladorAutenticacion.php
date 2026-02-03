@@ -16,7 +16,9 @@ class ControladorAutenticacion extends Controlador {
             $this->redirigir('ofertas');
         }
         $this->renderizar('autenticacion/login', [
-            'titulo' => 'Iniciar Sesion'
+            'titulo' => 'Iniciar Sesion',
+            'metaDescripcion' => 'Inicia sesion en el Portal de Empleo de Castilla y Leon para acceder a tus ofertas guardadas y recomendaciones personalizadas.',
+            'csrfCampo' => $this->campoCSRF()
         ]);
     }
 
@@ -24,13 +26,17 @@ class ControladorAutenticacion extends Controlador {
      * Procesar login
      */
     public function procesarLogin() {
+        // Validar token CSRF
+        $this->verificarCSRF();
+
         $email = $this->obtenerPost('email');
         $contrasena = $_POST['contrasena'] ?? '';
 
         if (empty($email) || empty($contrasena)) {
             $this->renderizar('autenticacion/login', [
                 'titulo' => 'Iniciar Sesion',
-                'error' => 'Todos los campos son obligatorios'
+                'error' => 'Todos los campos son obligatorios',
+                'csrfCampo' => $this->campoCSRF()
             ]);
             return;
         }
@@ -38,15 +44,17 @@ class ControladorAutenticacion extends Controlador {
         $usuario = Usuario::verificarCredenciales($email, $contrasena);
 
         if ($usuario) {
+            // Regenerar token CSRF tras login exitoso
+            unset($_SESSION['csrf_token']);
             $_SESSION['id_usuario'] = $usuario['id'];
             $_SESSION['nombre_usuario'] = $usuario['nombre'];
             $_SESSION['email_usuario'] = $usuario['email'];
-            $_SESSION['rol_usuario'] = $usuario['rol'];
             $this->redirigir('ofertas');
         } else {
             $this->renderizar('autenticacion/login', [
                 'titulo' => 'Iniciar Sesion',
-                'error' => 'Email o contrasena incorrectos'
+                'error' => 'Email o contrasena incorrectos',
+                'csrfCampo' => $this->campoCSRF()
             ]);
         }
     }
@@ -59,7 +67,9 @@ class ControladorAutenticacion extends Controlador {
             $this->redirigir('ofertas');
         }
         $this->renderizar('autenticacion/registro', [
-            'titulo' => 'Registrarse'
+            'titulo' => 'Registrarse',
+            'metaDescripcion' => 'Crea tu cuenta gratuita en el Portal de Empleo de Castilla y Leon. Guarda ofertas, recibe recomendaciones con IA y encuentra tu trabajo ideal.',
+            'csrfCampo' => $this->campoCSRF()
         ]);
     }
 
@@ -67,6 +77,9 @@ class ControladorAutenticacion extends Controlador {
      * Procesar registro de nuevo usuario
      */
     public function procesarRegistro() {
+        // Validar token CSRF
+        $this->verificarCSRF();
+
         $nombre = $this->obtenerPost('nombre');
         $email = $this->obtenerPost('email');
         $contrasena = $_POST['contrasena'] ?? '';
@@ -102,7 +115,8 @@ class ControladorAutenticacion extends Controlador {
             $this->renderizar('autenticacion/registro', [
                 'titulo' => 'Registrarse',
                 'errores' => $errores,
-                'datos' => $_POST
+                'datos' => $_POST,
+                'csrfCampo' => $this->campoCSRF()
             ]);
             return;
         }
@@ -114,8 +128,6 @@ class ControladorAutenticacion extends Controlador {
         $_SESSION['id_usuario'] = $idUsuario;
         $_SESSION['nombre_usuario'] = $nombre;
         $_SESSION['email_usuario'] = $email;
-        $_SESSION['rol_usuario'] = 'usuario';
-
         $this->redirigir('ofertas');
     }
 

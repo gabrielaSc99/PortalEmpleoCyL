@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
     sector VARCHAR(100) DEFAULT '',
     nivel_experiencia ENUM('sin_experiencia', 'junior', 'intermedio', 'senior')
         DEFAULT 'sin_experiencia',
-    rol ENUM('usuario', 'administrador') DEFAULT 'usuario',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_email (email)
 ) ENGINE=InnoDB COMMENT='Tabla de usuarios registrados';
@@ -76,29 +75,3 @@ SELECT
     COUNT(DISTINCT empresa) as total_empresas
 FROM ofertas
 GROUP BY provincia, categoria;
-
--- Usuario administrador de prueba
--- Contrasena: admin123
-INSERT INTO usuarios (email, contrasena, nombre, provincia, sector, nivel_experiencia, rol)
-VALUES (
-    'admin@portalempleo.com',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-    'Administrador',
-    'Valladolid',
-    'Tecnologia',
-    'senior',
-    'administrador'
-);
-
--- Usuario de prueba
--- Contrasena: password
-INSERT INTO usuarios (email, contrasena, nombre, provincia, sector, nivel_experiencia, rol)
-VALUES (
-    'usuario@test.com',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-    'Usuario Prueba',
-    'Salamanca',
-    'Tecnologia',
-    'junior',
-    'usuario'
-);

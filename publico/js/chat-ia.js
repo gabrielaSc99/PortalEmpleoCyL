@@ -3,6 +3,9 @@
  * Busqueda por lenguaje natural y recomendaciones personalizadas
  */
 
+// Control de limite de peticiones
+let bloqueadoHasta = 0;
+
 /**
  * Enviar consulta de busqueda por lenguaje natural
  */
@@ -11,6 +14,14 @@ async function enviarConsultaIA() {
     const consulta = campoConsulta.value.trim();
 
     if (!consulta) return;
+
+    // Comprobar si estamos bloqueados por limite
+    const ahora = Date.now();
+    if (ahora < bloqueadoHasta) {
+        const segundosRestantes = Math.ceil((bloqueadoHasta - ahora) / 1000);
+        agregarMensajeChat('ia', `<p class="text-warning"><i class="fas fa-clock"></i> Limite de mensajes alcanzado. Espera ${segundosRestantes} segundos antes de enviar otra consulta.</p>`);
+        return;
+    }
 
     // Mostrar mensaje del usuario en el chat
     agregarMensajeChat('usuario', consulta);
@@ -54,13 +65,15 @@ async function enviarConsultaIA() {
             }
 
             agregarMensajeChat('ia', contenidoRespuesta);
+        } else if (datos.mensaje && datos.mensaje.includes('LIMITE_ALCANZADO')) {
+            bloqueadoHasta = Date.now() + 60000;
+            agregarMensajeChat('ia', '<p class="text-warning"><i class="fas fa-clock"></i> Limite de mensajes alcanzado. Espera 1 minuto antes de enviar otra consulta.</p>');
         } else {
             agregarMensajeChat('ia', '<p class="text-danger">Error: ' + (datos.mensaje || 'No se pudo procesar la consulta') + '</p>');
         }
     } catch (error) {
         eliminarMensajeChat(idCarga);
-        console.error('Error chat IA:', error);
-        agregarMensajeChat('ia', '<p class="text-danger">Error: ' + error.message + '</p>');
+        agregarMensajeChat('ia', '<p class="text-danger">Error de conexion. Intentalo de nuevo.</p>');
     }
 }
 
@@ -68,6 +81,12 @@ async function enviarConsultaIA() {
  * Obtener recomendaciones personalizadas
  */
 async function obtenerRecomendaciones() {
+    const ahora = Date.now();
+    if (ahora < bloqueadoHasta) {
+        const segundosRestantes = Math.ceil((bloqueadoHasta - ahora) / 1000);
+        agregarMensajeChat('ia', `<p class="text-warning"><i class="fas fa-clock"></i> Limite de mensajes alcanzado. Espera ${segundosRestantes} segundos antes de pedir recomendaciones.</p>`);
+        return;
+    }
     const idCarga = agregarMensajeChat('ia', '<div class="cargando-ia"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Analizando tu perfil para recomendaciones...</div>');
 
     try {
@@ -100,6 +119,9 @@ async function obtenerRecomendaciones() {
             }
 
             agregarMensajeChat('ia', contenido);
+        } else if (datos.mensaje && datos.mensaje.includes('LIMITE_ALCANZADO')) {
+            bloqueadoHasta = Date.now() + 60000;
+            agregarMensajeChat('ia', '<p class="text-warning"><i class="fas fa-clock"></i> Limite de mensajes alcanzado. Espera 1 minuto antes de pedir recomendaciones.</p>');
         } else {
             agregarMensajeChat('ia', '<p class="text-danger">' + (datos.mensaje || 'Error al obtener recomendaciones') + '</p>');
         }

@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portal de Empleo Inteligente de Castilla y León - Busca ofertas de empleo con IA">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="<?= htmlspecialchars($metaDescripcion ?? 'Portal de Empleo Inteligente de Castilla y León. Encuentra ofertas de trabajo con búsqueda por IA, recomendaciones personalizadas y datos actualizados de la Junta de CyL.') ?>">
+    <meta name="keywords" content="<?= htmlspecialchars($metaKeywords ?? 'empleo, trabajo, ofertas, Castilla y León, CyL, búsqueda empleo, IA, inteligencia artificial, Valladolid, León, Burgos, Salamanca') ?>">
+    <meta name="author" content="Portal de Empleo CyL">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph (Redes Sociales) -->
+    <meta property="og:title" content="<?= htmlspecialchars($titulo ?? 'Portal de Empleo CyL') ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($metaDescripcion ?? 'Encuentra tu empleo ideal en Castilla y León con búsqueda inteligente por IA.') ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="Portal de Empleo CyL">
+
     <title><?= htmlspecialchars($titulo ?? 'Portal de Empleo CyL') ?></title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="img/logo-icono.svg">
+    <link rel="apple-touch-icon" href="img/logo-icono.svg">
+
+    <!-- Fuentes y CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,8 +35,7 @@
     <nav class="navbar navbar-expand-lg navbar-portal sticky-top" id="navbarPrincipal" role="navigation" aria-label="Navegación principal">
         <div class="container">
             <a class="navbar-brand" href="index.php?ruta=inicio" aria-label="Inicio - Portal de Empleo CyL">
-                <span class="icono-marca"><i class="fas fa-briefcase"></i></span>
-                Empleo CyL
+                <img src="img/logo-blanco.svg" alt="Empleo CyL - Portal de Empleo Inteligente" class="logo-navbar" height="52">
             </a>
 
             <button class="hamburguesa-btn d-lg-none" type="button" data-bs-toggle="collapse"
@@ -50,9 +68,6 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="index.php?ruta=perfil"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
-                                <?php if (($_SESSION['rol_usuario'] ?? '') === 'administrador'): ?>
-                                    <li><a class="dropdown-item" href="index.php?ruta=admin"><i class="fas fa-cogs"></i> Administración</a></li>
-                                <?php endif; ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="index.php?ruta=logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                             </ul>
@@ -85,8 +100,7 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="marca-pie">
-                        <span class="icono-marca-pie"><i class="fas fa-briefcase"></i></span>
-                        Empleo CyL
+                        <img src="img/logo-blanco.svg" alt="Empleo CyL" class="logo-footer" height="55">
                     </div>
                     <p class="descripcion-pie">Portal de empleo inteligente con datos abiertos de la Junta de Castilla y León. Búsqueda con IA y actualización automática.</p>
                 </div>

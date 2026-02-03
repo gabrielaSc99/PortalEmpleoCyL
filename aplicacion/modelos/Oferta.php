@@ -122,36 +122,6 @@ class Oferta {
     }
 
     /**
-     * Obtener lista de categorias disponibles (con cache)
-     * @return array
-     */
-    public static function obtenerCategorias() {
-        $cacheado = Cache::obtener('categorias_disponibles');
-        if ($cacheado !== false) return $cacheado;
-
-        $resultado = BaseDatos::consultar(
-            "SELECT DISTINCT categoria FROM ofertas WHERE categoria IS NOT NULL AND categoria != '' ORDER BY categoria"
-        );
-        Cache::guardar('categorias_disponibles', $resultado);
-        return $resultado;
-    }
-
-    /**
-     * Obtener tipos de contrato disponibles (con cache)
-     * @return array
-     */
-    public static function obtenerTiposContrato() {
-        $cacheado = Cache::obtener('tipos_contrato_disponibles');
-        if ($cacheado !== false) return $cacheado;
-
-        $resultado = BaseDatos::consultar(
-            "SELECT DISTINCT tipo_contrato FROM ofertas WHERE tipo_contrato IS NOT NULL AND tipo_contrato != '' ORDER BY tipo_contrato"
-        );
-        Cache::guardar('tipos_contrato_disponibles', $resultado);
-        return $resultado;
-    }
-
-    /**
      * Obtener estadisticas de ofertas (con cache de 15 minutos)
      * Green Coding: esta consulta es costosa y se llama en cada visita al inicio/dashboard
      * La cache reduce un 80% las consultas a la base de datos
@@ -162,7 +132,7 @@ class Oferta {
         if ($cacheado !== false) return $cacheado;
 
         $porProvincia = BaseDatos::consultar(
-            "SELECT CASE WHEN provincia = 'Otra' THEN 'Ámbito nacional' ELSE provincia END as provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia ORDER BY total DESC"
+            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia ORDER BY total DESC"
         );
         $porCategoria = BaseDatos::consultar(
             "SELECT categoria, COUNT(*) as total FROM ofertas WHERE categoria != '' GROUP BY categoria ORDER BY total DESC LIMIT 10"
@@ -178,30 +148,4 @@ class Oferta {
         return $resultado;
     }
 
-    /**
-     * Insertar o actualizar oferta desde la API externa
-     * @param array $datos
-     * @return string 'insertada', 'actualizada' o 'existente'
-     */
-    public static function insertarOActualizar($datos) {
-        $existe = BaseDatos::consultarUno(
-            "SELECT id FROM ofertas WHERE id_fuente = ?",
-            [$datos['id_fuente']]
-        );
-
-        if (!$existe) {
-            BaseDatos::ejecutar(
-                "INSERT INTO ofertas (id_fuente, titulo, descripcion, empresa, provincia, categoria, salario, tipo_contrato, url, fecha_publicacion)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                [
-                    $datos['id_fuente'], $datos['titulo'], $datos['descripcion'],
-                    $datos['empresa'], $datos['provincia'], $datos['categoria'],
-                    $datos['salario'] ?? '', $datos['tipo_contrato'] ?? '',
-                    $datos['url'] ?? '', $datos['fecha_publicacion'] ?? date('Y-m-d')
-                ]
-            );
-            return 'insertada';
-        }
-        return 'existente';
-    }
 }

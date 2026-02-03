@@ -33,8 +33,16 @@ class ControladorOfertas extends Controlador {
 
         $provincias = Oferta::obtenerProvincias();
 
+        // Meta descripcion dinamica segun filtros
+        $metaDesc = 'Encuentra ' . $resultado['total'] . ' ofertas de empleo en Castilla y Leon.';
+        if (!empty($filtros['provincia'])) {
+            $metaDesc = 'Ofertas de empleo en ' . $filtros['provincia'] . '. ' . $resultado['total'] . ' puestos disponibles.';
+        }
+
         $this->renderizar('ofertas/listado', [
-            'titulo' => 'Ofertas de Empleo',
+            'titulo' => 'Ofertas de Empleo en Castilla y Leon',
+            'metaDescripcion' => $metaDesc . ' Busqueda con filtros y actualizacion diaria desde datos abiertos de la Junta.',
+            'metaKeywords' => 'ofertas empleo, trabajo Castilla Leon, ' . (!empty($filtros['provincia']) ? 'empleo ' . $filtros['provincia'] . ', ' : '') . 'buscar trabajo, ofertas CyL',
             'ofertas' => $resultado['ofertas'],
             'total' => $resultado['total'],
             'paginas' => $resultado['paginas'],
@@ -62,8 +70,20 @@ class ControladorOfertas extends Controlador {
             $esFavorito = Favorito::esFavorito($_SESSION['id_usuario'], $id);
         }
 
+        // Meta descripcion con datos de la oferta
+        $metaDesc = 'Oferta de empleo: ' . $oferta['titulo'];
+        if (!empty($oferta['empresa'])) {
+            $metaDesc .= ' en ' . $oferta['empresa'];
+        }
+        if (!empty($oferta['provincia'])) {
+            $metaDesc .= ' (' . $oferta['provincia'] . ')';
+        }
+        $metaDesc .= '. Consulta requisitos y como aplicar.';
+
         $this->renderizar('ofertas/detalle', [
-            'titulo' => $oferta['titulo'],
+            'titulo' => $oferta['titulo'] . ' - Empleo CyL',
+            'metaDescripcion' => $metaDesc,
+            'metaKeywords' => 'oferta empleo, ' . ($oferta['empresa'] ?? '') . ', trabajo ' . ($oferta['provincia'] ?? 'Castilla Leon') . ', ' . $oferta['titulo'],
             'oferta' => $oferta,
             'esFavorito' => $esFavorito
         ]);
@@ -99,7 +119,9 @@ class ControladorOfertas extends Controlador {
     public function mapa() {
         $estadisticas = Oferta::obtenerEstadisticas();
         $this->renderizar('ofertas/mapa', [
-            'titulo' => 'Mapa de Ofertas',
+            'titulo' => 'Mapa de Ofertas de Empleo en Castilla y Leon',
+            'metaDescripcion' => 'Mapa interactivo con ofertas de empleo en las 9 provincias de Castilla y Leon. Visualiza donde hay mas oportunidades laborales.',
+            'metaKeywords' => 'mapa empleo Castilla Leon, ofertas por provincia, trabajo Valladolid, empleo Leon, Burgos, Salamanca',
             'estadisticas' => $estadisticas
         ]);
     }
@@ -125,7 +147,7 @@ class ControladorOfertas extends Controlador {
         ];
 
         $porProvincia = BaseDatos::consultar(
-            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' AND provincia != 'Otra' GROUP BY provincia"
+            "SELECT provincia, COUNT(*) as total FROM ofertas WHERE provincia != '' GROUP BY provincia"
         );
 
         $marcadores = [];

@@ -166,6 +166,12 @@ h1, h2, h3, h4, h5, h6,
     transition: var(--transicion-normal);
     padding: 0.6rem 0.9rem;
 }
+.form-select {
+    padding-right: 2.25rem;
+    background-position: right 0.5rem center;
+    background-size: 16px 12px;
+    min-width: 120px;
+}
 .form-control:focus, .form-select:focus {
     border-color: var(--dorado);
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
@@ -215,26 +221,21 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .navbar-portal .navbar-brand {
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 1.15rem;
-    letter-spacing: -0.03em;
-    color: #fff !important;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    padding: 0.25rem 0;
 }
 
-.navbar-portal .navbar-brand .icono-marca {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
-    border-radius: var(--radio-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--azul-profundo);
-    font-size: 0.9rem;
+.navbar-portal .navbar-brand .logo-navbar {
+    height: 52px;
+    width: auto;
+    transition: var(--transicion-normal);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.navbar-portal .navbar-brand:hover .logo-navbar {
+    transform: scale(1.05);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) brightness(1.1);
 }
 
 .navbar-portal .nav-link {
@@ -1208,17 +1209,6 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ============================
-   Panel admin
-   ============================ */
-.tabla-admin {
-    font-size: 0.875rem;
-}
-
-.estado-exitoso { color: var(--exito); }
-.estado-fallido { color: var(--peligro); }
-.estado-parcial { color: var(--aviso); }
-
-/* ============================
    Formularios de autenticacion
    ============================ */
 .tarjeta-auth {
@@ -1267,26 +1257,17 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .pie-pagina .marca-pie {
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
-.pie-pagina .marca-pie .icono-marca-pie {
-    width: 28px;
-    height: 28px;
-    background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
-    border-radius: var(--radio-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--azul-profundo);
-    font-size: 0.75rem;
+.pie-pagina .marca-pie .logo-footer {
+    height: 55px;
+    width: auto;
+    transition: var(--transicion-normal);
+}
+
+.pie-pagina .marca-pie .logo-footer:hover {
+    filter: brightness(1.1);
 }
 
 .pie-pagina .descripcion-pie {

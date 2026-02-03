@@ -6,7 +6,7 @@ require_once __DIR__ . '/../modelos/Usuario.php';
 
 /**
  * Controlador de Inteligencia Artificial
- * Integra OpenRouter para busqueda por lenguaje natural y recomendaciones
+ * Integra Google Gemini para busqueda por lenguaje natural y recomendaciones
  */
 class ControladorIA extends Controlador {
 
@@ -224,30 +224,28 @@ Responde UNICAMENTE con un JSON valido (sin markdown) con esta estructura:
     }
 
     /**
-     * Llamar a la API de OpenRouter
+     * Llamar a la API de Google Gemini
      * @param string $prompt Texto del prompt
      * @return string|false Respuesta de texto o false en caso de error
      */
     private function llamarIA($prompt) {
         $datos = [
-            'model' => $this->modelo,
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt]
+            'contents' => [
+                ['parts' => [['text' => $prompt]]]
             ],
-            'temperature' => 0.3,
-            'max_tokens' => 1024
+            'generationConfig' => [
+                'temperature' => 0.3,
+                'maxOutputTokens' => 1024
+            ]
         ];
 
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $this->claveApi
-        ];
+        $url = $this->urlApi . '?key=' . $this->claveApi;
 
-        $ch = curl_init($this->urlApi);
+        $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_POSTFIELDS => json_encode($datos),
             CURLOPT_TIMEOUT => 30,
             CURLOPT_SSL_VERIFYPEER => false
@@ -260,8 +258,8 @@ Responde UNICAMENTE con un JSON valido (sin markdown) con esta estructura:
 
         if ($respuesta === false || $httpCode !== 200) {
             if ($httpCode === 429) {
-                $this->ultimoError = 'Cuota de la API agotada. Intentalo mas tarde.';
-            } elseif ($httpCode === 401) {
+                $this->ultimoError = 'LIMITE_ALCANZADO';
+            } elseif ($httpCode === 403) {
                 $this->ultimoError = 'Clave de API no valida.';
             } else {
                 $this->ultimoError = $curlError ?: "HTTP $httpCode - $respuesta";
@@ -271,6 +269,6 @@ Responde UNICAMENTE con un JSON valido (sin markdown) con esta estructura:
 
         $resultado = json_decode($respuesta, true);
 
-        return $resultado['choices'][0]['message']['content'] ?? false;
+        return $resultado['candidates'][0]['content']['parts'][0]['text'] ?? false;
     }
 }

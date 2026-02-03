@@ -4,7 +4,7 @@
  * Descarga datos desde la API de datos abiertos de Castilla y Leon
  *
  * Uso manual: php tareas_programadas/sincronizar_ofertas.php
- * Cron: 0 */6 * * * php /ruta/completa/tareas_programadas/sincronizar_ofertas.php
+ * Cron: 0 0 * * * php /ruta/completa/tareas_programadas/sincronizar_ofertas.php
  */
 
 require_once __DIR__ . '/../aplicacion/nucleo/BaseDatos.php';
@@ -125,7 +125,7 @@ class ServicioSincronizacion {
             'titulo' => trim($registro['titulo'] ?? 'Sin titulo'),
             'descripcion' => $descripcion,
             'empresa' => trim($registro['fuentecontenido'] ?? ''),
-            'provincia' => trim($registro['provincia'] ?? ''),
+            'provincia' => trim($registro['provincia'] ?? '') === 'Otra' ? 'Ambito Nacional' : trim($registro['provincia'] ?? ''),
             'categoria' => '', // La API no tiene campo de categoria
             'salario' => '',
             'tipo_contrato' => '',

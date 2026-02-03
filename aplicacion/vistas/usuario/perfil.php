@@ -18,6 +18,7 @@
                     <?php endif; ?>
 
                     <form action="index.php?ruta=perfil" method="POST">
+                        <?= $csrfCampo ?? '' ?>
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre completo</label>
                             <input type="text" class="form-control" id="nombre" name="nombre" required

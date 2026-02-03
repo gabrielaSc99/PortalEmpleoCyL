@@ -69,4 +69,58 @@ class Controlador {
     protected function obtenerGet($campo, $defecto = null) {
         return isset($_GET[$campo]) ? trim(htmlspecialchars($_GET[$campo])) : $defecto;
     }
+
+    /**
+     * Generar token CSRF y guardarlo en sesion
+     * @return string Token generado
+     */
+    protected function generarTokenCSRF() {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
+    }
+
+    /**
+     * Obtener el campo hidden HTML con el token CSRF
+     * @return string HTML del campo hidden
+     */
+    protected function campoCSRF() {
+        $token = $this->generarTokenCSRF();
+        return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token) . '">';
+    }
+
+    /**
+     * Validar token CSRF de una peticion POST
+     * @return bool True si el token es valido
+     */
+    protected function validarCSRF() {
+        if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token'])) {
+            return false;
+        }
+        return hash_equals($_SESSION['csrf_token'], $_POST['csrf_token']);
+    }
+
+    /**
+     * Verificar CSRF y responder con error si falla
+     * Para usar en controladores que procesan formularios
+     */
+    protected function verificarCSRF() {
+        if (!$this->validarCSRF()) {
+            if ($this->esAjax()) {
+                $this->responderJSON(['error' => 'Token de seguridad inválido. Recarga la página.'], 403);
+            } else {
+                die('Error de seguridad: Token CSRF inválido. <a href="javascript:history.back()">Volver</a>');
+            }
+        }
+    }
+
+    /**
+     * Comprobar si la peticion es AJAX
+     * @return bool
+     */
+    protected function esAjax() {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
 }
