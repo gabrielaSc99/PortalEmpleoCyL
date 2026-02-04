@@ -67,6 +67,7 @@
                                 <i class="fas fa-user-circle"></i> <?= htmlspecialchars($_SESSION['nombre_usuario']) ?>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="index.php?ruta=dashboard"><i class="fas fa-tachometer-alt"></i> Mi Panel</a></li>
                                 <li><a class="dropdown-item" href="index.php?ruta=perfil"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="index.php?ruta=logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
@@ -121,7 +122,7 @@
                 </div>
             </div>
             <div class="linea-inferior d-flex flex-wrap justify-content-between">
-                <span>&copy; 2025 Portal de Empleo Inteligente - Proyecto Intermodular DAW</span>
+                <span>&copy; 2026 Portal de Empleo Inteligente - Proyecto Intermodular DAW</span>
                 <span>Hecho con <i class="fas fa-heart" style="color: var(--peligro);"></i> en Castilla y León</span>
             </div>
         </div>

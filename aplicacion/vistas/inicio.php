@@ -23,9 +23,9 @@
                            placeholder="Buscar por puesto, empresa o palabra clave..."
                            aria-label="Término de búsqueda"
                            autocomplete="off">
-                    <button type="submit" class="btn boton-buscar-hero" aria-label="Buscar">
-                        <i class="fas fa-search me-1"></i> Buscar
-                    </button>
+                   <button type="submit" class="btn boton-buscar-hero" aria-label="Buscar">
+                    <i class="fas fa-search"></i><span class="d-none d-sm-inline ms-1">Buscar</span>                                                        
+                </button>
                 </form>
 
                 <!-- Filtros rapidos (pills) -->

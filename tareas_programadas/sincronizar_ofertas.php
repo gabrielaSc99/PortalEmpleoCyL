@@ -26,8 +26,10 @@ class ServicioSincronizacion {
 
         $totalAnadidas = 0;
         $totalActualizadas = 0;
+        $totalEliminadas = 0;
         $offset = 0;
         $totalRegistros = null;
+        $idsFuenteAPI = [];
 
         try {
             do {
@@ -46,6 +48,7 @@ class ServicioSincronizacion {
 
                 foreach ($registros as $registro) {
                     $oferta = $this->mapearOferta($registro);
+                    $idsFuenteAPI[] = $oferta['id_fuente'];
                     $resultado = $this->insertarOferta($oferta);
 
                     if ($resultado === 'insertada') {
@@ -63,11 +66,14 @@ class ServicioSincronizacion {
 
             } while ($offset < $totalRegistros);
 
+            // Purgar ofertas que ya no existen en la API
+            $totalEliminadas = $this->purgarOfertasObsoletas($idsFuenteAPI);
+
             // Registrar sincronizacion exitosa
-            $this->registrarSincronizacion($totalAnadidas, $totalActualizadas, 'exitoso');
+            $this->registrarSincronizacion($totalAnadidas, $totalActualizadas, $totalEliminadas, 'exitoso');
 
             // Limpiar cache si hubo cambios
-            if ($totalAnadidas > 0 || $totalActualizadas > 0) {
+            if ($totalAnadidas > 0 || $totalActualizadas > 0 || $totalEliminadas > 0) {
                 Cache::limpiarTodo();
                 echo "Cache limpiada (hubo cambios)\n";
             }
@@ -75,10 +81,11 @@ class ServicioSincronizacion {
             echo "[" . date('Y-m-d H:i:s') . "] Sincronizacion completada.\n";
             echo "Ofertas nuevas: $totalAnadidas\n";
             echo "Ofertas actualizadas: $totalActualizadas\n";
+            echo "Ofertas eliminadas (obsoletas): $totalEliminadas\n";
 
         } catch (Exception $e) {
             echo "ERROR: " . $e->getMessage() . "\n";
-            $this->registrarSincronizacion($totalAnadidas, $totalActualizadas, 'fallido', $e->getMessage());
+            $this->registrarSincronizacion($totalAnadidas, $totalActualizadas, $totalEliminadas, 'fallido', $e->getMessage());
         }
     }
 
@@ -172,18 +179,44 @@ class ServicioSincronizacion {
     }
 
     /**
+     * Eliminar ofertas que ya no existen en la API
+     * @param array $idsFuenteAPI IDs de fuente recibidos de la API
+     * @return int Numero de ofertas eliminadas
+     */
+    private function purgarOfertasObsoletas($idsFuenteAPI) {
+        if (empty($idsFuenteAPI)) {
+            return 0;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($idsFuenteAPI), '?'));
+        $resultado = BaseDatos::ejecutar(
+            "DELETE FROM ofertas WHERE id_fuente NOT IN ($placeholders)",
+            $idsFuenteAPI
+        );
+
+        $eliminadas = $resultado->rowCount();
+
+        if ($eliminadas > 0) {
+            echo "Purgadas $eliminadas ofertas obsoletas que ya no estan en la API\n";
+        }
+
+        return $eliminadas;
+    }
+
+    /**
      * Registrar resultado de la sincronizacion en la base de datos
      * @param int $anadidas
      * @param int $actualizadas
+     * @param int $eliminadas
      * @param string $estado
      * @param string $mensajeError
      */
-    private function registrarSincronizacion($anadidas, $actualizadas, $estado, $mensajeError = null) {
+    private function registrarSincronizacion($anadidas, $actualizadas, $eliminadas, $estado, $mensajeError = null) {
         try {
             BaseDatos::ejecutar(
-                "INSERT INTO registros_sincronizacion (registros_anadidos, registros_actualizados, estado, mensaje_error)
-                 VALUES (?, ?, ?, ?)",
-                [$anadidas, $actualizadas, $estado, $mensajeError]
+                "INSERT INTO registros_sincronizacion (registros_anadidos, registros_actualizados, registros_eliminados, estado, mensaje_error)
+                 VALUES (?, ?, ?, ?, ?)",
+                [$anadidas, $actualizadas, $eliminadas, $estado, $mensajeError]
             );
         } catch (Exception $e) {
             echo "Error al registrar sincronizacion: " . $e->getMessage() . "\n";

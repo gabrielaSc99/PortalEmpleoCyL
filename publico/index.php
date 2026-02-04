@@ -34,6 +34,7 @@ Enrutador::post('api/favoritos/eliminar', 'ControladorFavoritos', 'eliminar');
 Enrutador::post('api/favoritos/estado', 'ControladorFavoritos', 'cambiarEstado');
 
 // Usuario
+Enrutador::get('dashboard', 'ControladorUsuario', 'dashboard');
 Enrutador::get('perfil', 'ControladorUsuario', 'perfil');
 Enrutador::post('perfil', 'ControladorUsuario', 'perfil');
 

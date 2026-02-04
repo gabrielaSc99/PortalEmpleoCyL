@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS registros_sincronizacion (
     fecha_sincronizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     registros_anadidos INT DEFAULT 0,
     registros_actualizados INT DEFAULT 0,
+    registros_eliminados INT DEFAULT 0,
     estado ENUM('exitoso', 'parcial', 'fallido') DEFAULT 'exitoso',
     mensaje_error TEXT,
     INDEX idx_fecha_sincronizacion (fecha_sincronizacion)

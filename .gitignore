@@ -1,23 +1,5 @@
 # Configuracion sensible
 configuracion/claves_api.php
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Archivos del proyecto no relevantes
-PROMPT_MASTER_PROYECTO_INTERMODULAR*
-.claude/
-
-# Sistema
-.DS_Store
-Thumbs.db
-
 # Cache
 cache/
-
-# Dependencias
-vendor/
-node_modules/
