@@ -46,7 +46,7 @@
                     <div class="icono-estadistica" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
                         <i class="fas fa-map-marker-alt"></i>
                     </div>
-                    <div class="valor-estadistica" style="font-size: 1.25rem;"><?= htmlspecialchars($usuario['provincia'] ?? 'N/A') ?></div>
+                    <div class="valor-estadistica texto-largo"><?= htmlspecialchars($usuario['provincia'] ?? 'N/A') ?></div>
                     <div class="etiqueta-estadistica">Tu provincia</div>
                 </div>
             </div>

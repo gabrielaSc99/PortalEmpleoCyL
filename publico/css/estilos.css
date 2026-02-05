@@ -750,6 +750,12 @@ h1, h2, h3, h4, h5, h6,
     padding: 1.25rem;
     text-align: center;
     transition: var(--transicion-suave);
+    height: 100%;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .tarjeta-estadistica:hover {
@@ -793,14 +799,25 @@ h1, h2, h3, h4, h5, h6,
     font-weight: 700;
     font-size: 1.75rem;
     color: var(--texto-principal);
-    line-height: 1;
+    line-height: 1.2;
     margin-bottom: 0.25rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .tarjeta-estadistica .etiqueta-estadistica {
     font-size: 0.8rem;
     color: var(--texto-secundario);
     font-weight: 500;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.tarjeta-estadistica .valor-estadistica.texto-largo {
+    font-size: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* ============================
@@ -1410,8 +1427,10 @@ h1, h2, h3, h4, h5, h6,
     background: var(--fondo-tarjeta);
     border: 1px solid var(--borde-suave);
     border-radius: var(--radio-xl);
-    overflow: hidden;
+    overflow: visible;
     transition: var(--transicion-suave);
+    padding: 1.25rem;
+    height: 100%;
 }
 
 .tarjeta-panel:hover {
