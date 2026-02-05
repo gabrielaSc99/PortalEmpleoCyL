@@ -57,9 +57,9 @@
             <p style="color: var(--texto-secundario); font-size: 0.9rem;">Distribución geográfica de ofertas en Castilla y León</p>
         </div>
 
-        <div class="row g-3">
-            <div class="col-lg-9">
-                <div class="tarjeta-panel" style="padding: 0; overflow: hidden;">
+        <div class="row g-3 align-items-stretch">
+            <div class="col-lg-9 d-flex">
+                <div class="tarjeta-panel tarjeta-panel-mapa w-100" style="padding: 0; overflow: hidden;">
                     <div id="mapaOfertas"></div>
                 </div>
             </div>
@@ -107,8 +107,16 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
+    .tarjeta-panel-mapa {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     #mapaOfertas {
-        height: 450px;
+        flex: 1;
+        min-height: 350px;
+        width: 100%;
         border-radius: var(--radio-lg);
         z-index: 1;
     }
@@ -169,7 +177,7 @@
 
     @media (max-width: 767.98px) {
         #mapaOfertas {
-            height: 300px;
+            min-height: 300px;
         }
     }
 </style>
@@ -187,6 +195,11 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
     maxZoom: 19
 }).addTo(mapaInicio);
+
+// Forzar recalculo de dimensiones del mapa
+setTimeout(function() {
+    mapaInicio.invalidateSize();
+}, 100);
 
 fetch('index.php?ruta=api/ofertas/mapa')
     .then(function(respuesta) { return respuesta.json(); })
@@ -224,7 +237,14 @@ fetch('index.php?ruta=api/ofertas/mapa')
                 );
             });
         }
+        // Recalcular de nuevo tras cargar marcadores
+        mapaInicio.invalidateSize();
     });
+
+// Recalcular al redimensionar ventana
+window.addEventListener('resize', function() {
+    mapaInicio.invalidateSize();
+});
 </script>
 
 <!-- Últimas ofertas publicadas -->
