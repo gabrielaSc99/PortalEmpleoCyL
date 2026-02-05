@@ -5,7 +5,7 @@ Portal web para la búsqueda y gestión de ofertas de empleo en Castilla y León
 ## Características principales
 
 - **Listado de ofertas** con paginación, filtros por texto, provincia y categoría
-- **Búsqueda inteligente con IA** mediante lenguaje natural (Google Gemini)
+- **Búsqueda inteligente con IA** mediante lenguaje natural (Groq Llama 3.3 70B)
 - **Recomendaciones personalizadas** basadas en el perfil del usuario
 - **Sistema de favoritos** con estados de seguimiento (interesado, aplicado, descartado)
 - **Mapa interactivo** de ofertas por provincia con Leaflet.js
@@ -22,7 +22,7 @@ Portal web para la búsqueda y gestión de ofertas de empleo en Castilla y León
 | Backend | PHP 8.2, MariaDB / MySQL, arquitectura MVC |
 | Frontend | HTML5, CSS3, JavaScript ES6+, Bootstrap 5.3 |
 | Visualización | Chart.js (gráficos), Leaflet.js (mapas) |
-| IA | Google Gemini API |
+| IA | Groq API (Llama 3.3 70B) con modo fallback |
 | Datos | API de Datos Abiertos de la Junta de Castilla y León |
 
 ## Requisitos
@@ -75,14 +75,16 @@ Crear el archivo `configuracion/claves_api.php`:
 <?php
 return [
     'ia' => [
-        'clave'  => 'TU_API_KEY_DE_GOOGLE_GEMINI',
-        'modelo' => 'gemini-2.0-flash',
-        'url'    => 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+        'clave'  => 'TU_API_KEY_DE_GROQ',
+        'modelo' => 'llama-3.3-70b-versatile',
+        'url'    => 'https://api.groq.com/openai/v1/chat/completions'
     ]
 ];
 ```
 
-Obtener una API key en: https://aistudio.google.com/apikey
+Obtener una API key en: https://console.groq.com/keys
+
+> **Nota:** El sistema incluye modo fallback automático. Si la API de IA no está disponible, las búsquedas se realizan directamente en la base de datos sin interrumpir al usuario.
 
 ### 5. Configurar permisos del directorio de caché
 
@@ -223,7 +225,7 @@ El token se configura mediante la variable de entorno `CRON_SYNC_TOKEN` o editan
 3. Importar `base_datos/esquema.sql` en phpMyAdmin
 4. Subir archivos vía FTP (FileZilla o WinSCP)
 5. Configurar `configuracion/base_datos.php` con los datos del hosting
-6. Configurar `configuracion/claves_api.php` con la clave de Gemini
+6. Configurar `configuracion/claves_api.php` con la clave de Groq
 7. Programar la sincronización con [cron-job.org](https://cron-job.org)
 
 ## Fuente de datos
@@ -240,4 +242,4 @@ Proyecto de uso educativo desarrollado como Proyecto Intermodular del ciclo DAW.
 
 ---
 
-**Stack tecnológico:** PHP 8 · MySQL · Bootstrap 5 · Google Gemini AI · Leaflet.js · Chart.js
+**Stack tecnológico:** PHP 8 · MySQL · Bootstrap 5 · Groq Llama 3.3 AI · Leaflet.js · Chart.js
