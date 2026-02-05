@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /PortalEmpleoCyL/publico/
+
+# Si el archivo o directorio existe, servirlo directamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirigir todo a index.php
+RewriteRule ^(.*)$ index.php?ruta=$1 [QSA,L]

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="rojoIco" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F87171"/>
+      <stop offset="50%" style="stop-color:#EF4444"/>
+      <stop offset="100%" style="stop-color:#B91C1C"/>
+    </linearGradient>
+    <linearGradient id="grisIco" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#64748B"/>
+      <stop offset="50%" style="stop-color:#475569"/>
+      <stop offset="100%" style="stop-color:#1E293B"/>
+    </linearGradient>
+    <linearGradient id="doradoIco" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCD34D"/>
+      <stop offset="100%" style="stop-color:#F59E0B"/>
+    </linearGradient>
+    <filter id="sombraIco" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#0F172A" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#sombraIco)">
+    <!-- Hexágono -->
+    <polygon points="16,1 29,8.5 29,23.5 16,31 3,23.5 3,8.5" fill="url(#grisIco)"/>
+    <polygon points="16,1 29,8.5 29,23.5 16,31 3,23.5 3,8.5" fill="none" stroke="#94A3B8" stroke-width="1"/>
+
+    <!-- Barras simplificadas -->
+    <rect x="8" y="20" width="4" height="5" rx="0.5" fill="#94A3B8"/>
+    <rect x="14" y="16" width="4" height="9" rx="0.5" fill="#CBD5E1"/>
+    <rect x="20" y="10" width="4" height="15" rx="0.5" fill="url(#rojoIco)"/>
+
+    <!-- Flecha -->
+    <path d="M10,18 Q14,14 20,9" fill="none" stroke="url(#rojoIco)" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="20,9 24,8 21,12" fill="url(#rojoIco)"/>
+
+    <!-- Puntos dorados -->
+    <circle cx="16" cy="3" r="1.2" fill="url(#doradoIco)"/>
+    <circle cx="16" cy="29" r="1.2" fill="url(#doradoIco)"/>
+  </g>
+</svg>

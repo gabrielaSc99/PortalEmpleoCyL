@@ -1,0 +1,10 @@
+# Configuracion sensible
+configuracion/claves_api.php
+
+# Cache
+cache/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
